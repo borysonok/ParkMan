@@ -1,10 +1,10 @@
 import React from 'react';
-import MapBoxComponent from './MapBoxComponent';
+import MapboxReact from './MapboxReact';
 
 export default function MainPage() {
   return (
     <div>
-      <MapBoxComponent />
+      <MapboxReact />
     </div>
   );
 }

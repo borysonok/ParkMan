@@ -2,11 +2,39 @@
 import React, { Component } from 'react';
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl.js'
 
-mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
+//mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
 
+//============================================================//
+
+var geojson = {
+  type: 'FeatureCollection',
+  features: [{
+    type: 'Feature',
+    geometry: {
+      type: 'Point',
+      coordinates: [-74.005, 40.701]
+    },
+    properties: {
+      title: 'Mapbox',
+      description: 'Washington, D.C.'
+    }
+  },
+  {
+    type: 'Feature',
+    geometry: {
+      type: 'Point',
+      coordinates: [-74.006, 40.702]
+    },
+    properties: {
+      title: 'Mapbox',
+      description: 'San Francisco, California'
+    }
+  }]
+};
+
+//=========================================================//
 
 export default class Map extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -18,13 +46,14 @@ export default class Map extends Component {
 
   componentDidMount() {
     const { lng, lat, zoom } = this.state;
-
     this.map = new mapboxgl.Map({
       container: this.mapContainer,
       style: 'mapbox://styles/mapbox/streets-v10',
       center: [lng, lat],
       zoom
     });
+
+    //==============================//
 
     this.map.on('load', () => {
       this.map.addLayer({
@@ -47,17 +76,24 @@ export default class Map extends Component {
       });
     });
 
-    const markerDomEl = document.createElement("div"); // Create a new, detached DIV
-    markerDomEl.style.width = "32px";
-    markerDomEl.style.height = "39px";
-    markerDomEl.style.backgroundImage = "url(http://i.imgur.com/WbMOfMl.png)";
+    this.map.on('click', (e) => {
+      console.log("====== e: ", e);
+      var latitude = e.lngLat.lat;
+      var longitude = e.lngLat.lng;
 
-    new mapboxgl.Marker(markerDomEl).setLngLat([-74.009, 40.705]).addTo(this.map); // [-87.6354, 41.8885] for Chicago
+      console.log(latitude + " - " + longitude)
+    });
 
-    this.map.on('mousemove', () => { });
 
+    geojson.features.forEach(marker => {
+      const el = document.createElement('div');
+      el.className = 'marker';
+      new mapboxgl.Marker(el).setLngLat(marker.geometry.coordinates)
+        .setPopup(new mapboxgl.Popup({ offset: 25 })
+          .setHTML('<h3>' + marker.properties.title + '</h3><p>' + marker.properties.description + '</p>'))
+        .addTo(this.map);
+    });
   }
-
 
   componentWillUnmount() {
     this.map.remove();

@@ -19,3 +19,24 @@ form div {
   margin: 1em;
   display: inline-block;
 }
+
+.marker-green {
+  background-image: url('./circle-32_green.ico');
+  background-size: cover;
+  width: 10px;
+  height: 10px;
+}
+
+.marker-yellow {
+  background-image: url('./circle-32_yellow.ico');
+  background-size: cover;
+  width: 10px;
+  height: 10px;
+}
+
+.marker-red {
+  background-image: url('./circle-32_red.ico');
+  background-size: cover;
+  width: 10px;
+  height: 10px;
+}
