@@ -64,16 +64,13 @@ export default class Map extends Component {
   }
 
   render() {
-
     const { lng, lat, zoom } = this.state;
-
     const style = {
       position: 'inherit',
       height: 500,
       margin: 0,
       padding: 0
     }
-
     return (
       <div >
         <div>{`Longitude: ${lng} Latitude: ${lat} Zoom: ${zoom}`}</div>
