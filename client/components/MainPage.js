@@ -3,8 +3,10 @@ import MapboxReact from './MapboxReact';
 
 export default function MainPage() {
   return (
-    <div>
-      <MapboxReact />
+    <div className="ui container center">
+      <div >
+        <MapboxReact />
+      </div>
     </div>
   );
 }

@@ -21,22 +21,25 @@ form div {
 }
 
 .marker-green {
+  text-align: center;
   background-image: url('./circle-32_green.ico');
   background-size: cover;
-  width: 10px;
-  height: 10px;
+  width: 20px;
+  height: 20px;
 }
 
 .marker-yellow {
+  text-align: center;
   background-image: url('./circle-32_yellow.ico');
   background-size: cover;
-  width: 10px;
-  height: 10px;
+  width: 20px;
+  height: 20px;
 }
 
 .marker-red {
+  text-align: center;
   background-image: url('./circle-32_red.ico');
   background-size: cover;
-  width: 10px;
-  height: 10px;
+  width: 20px;
+  height: 20px;
 }

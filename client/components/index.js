@@ -8,3 +8,5 @@ export { default as UserHome } from './user-home';
 export { Login, Signup } from './auth-form';
 export { default as MainPage } from './MainPage';
 export { default as MapboxReact } from './MapboxReact';
+export { default as InfoBox } from './InfoBox';
+export { default as OrdersBox } from './OrdersBox';
