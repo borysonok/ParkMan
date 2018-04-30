@@ -47,11 +47,6 @@ let fakeMarkers = [{
 
 let fakeOrders = [];
 
-//==================================== UTILITY ============================================//
-
-// pup simulation methods here....
-
-
 //====================================== MAP ==============================================//
 
 export default class Map extends Component {
@@ -61,7 +56,7 @@ export default class Map extends Component {
     constructor(props) {
         super(props);
         const _w = window.innerWidth;
-        const _h = window.innerHeight * 0.5;
+        const _h = window.innerHeight;
 
         this.state = {
             viewport: {
@@ -96,6 +91,7 @@ export default class Map extends Component {
         this._handleOnStop = this._handleOnStop.bind(this);
         this._handleOnOrder = this._handleOnOrder.bind(this);
         this._handleOnSetDuration = this._handleOnSetDuration.bind(this);
+        this._startTimer = this._startTimer.bind(this);
     }
     //============================= END OF CONSTRUCTOR  =====================================//
 
@@ -111,7 +107,7 @@ export default class Map extends Component {
 
     _resize = () => {
         const _w = window.innerWidth;
-        const _h = window.innerHeight * 0.5;
+        const _h = window.innerHeight;
         this.setState({
             viewport: {
                 ...this.state.viewport,
@@ -140,6 +136,42 @@ export default class Map extends Component {
     _goToFA = () => {
         const viewport = { ...this.state.viewport, longitude: -74.009, latitude: 40.705, zoom: 18 };
         this.setState({ viewport });
+    }
+
+    //==================================== TIMER ============================================//
+
+    // start countdown timer utility function:
+    _startTimer(duration, _marker) {
+
+        _marker.orderDuration = duration;
+        _marker.type = 'marker-red';
+
+        var countDownDate = new Date().getTime() + duration * 1000;
+        var x = setInterval(() => {
+            var now = new Date().getTime();
+            var distance = countDownDate - now;
+
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            _marker.timer = { days, hours, minutes, seconds, duration };
+
+            if (distance <= 0) {
+                clearInterval(x);
+                _marker.type = 'marker-green';
+                this.setState({ selectedMarker: _marker });
+                if (this.state.popupInfo && this.state.popupInfo.id === this.selectedMarker.id) {
+                    this.setState({ popupInfo: _marker });
+                }
+            } else {
+                this.setState({ selectedMarker: _marker });
+                if (this.state.popupInfo && this.state.popupInfo.id === this.selectedMarker.id) {
+                    this.setState({ popupInfo: _marker });
+                }
+            }
+        }, 1000);
     }
 
     //================================ ON CLICK EVENT  =====================================//
@@ -180,11 +212,18 @@ export default class Map extends Component {
                 // BUG: when I close the popup a new marker is being created, so I added this delay to temporary solve that issue
                 onClose={() => setTimeout(() => this.setState({ popupInfo: null }), 300)}
             >
-
-                <div>{popupInfo.id}</div>
-                <div>{popupInfo.longitude}</div>
-                <div>{popupInfo.latitude}</div>
-                {popupInfo.orderDuration ? <div>{popupInfo.orderDuration}</div> : null}
+                <div>id: {popupInfo.id}</div>
+                <div>lng: {popupInfo.longitude}</div>
+                <div>lat: {popupInfo.latitude}</div>
+                {popupInfo.orderDuration ? <div>duration: {popupInfo.orderDuration}</div> : null}
+                {popupInfo.timer ?
+                    <div>
+                        time left: {popupInfo.timer.days + 'd : '
+                            + popupInfo.timer.hours + 'h : '
+                            + popupInfo.timer.minutes + 'm : '
+                            + popupInfo.timer.seconds + 's'}
+                    </div>
+                    : null}
             </Popup>
         );
     }
@@ -210,10 +249,11 @@ export default class Map extends Component {
     _handleOnOrder = () => {
         const id = parseInt(Math.random() * 1000, 10);
         const markerId = this.state.selectedMarker.id;
-        const startTime = Date.now();
-        const duration = parseInt((Math.random() * 1000 * 60) * (Math.random() * 60), 10);
-        const endTime = startTime + duration;
-        const price = (duration * 0.1 / 10000).toFixed(2);
+        const duration = parseInt(this.state.selectedMarker.timer.duration, 10);
+        const startTime = new Date().getTime();
+        const endTime = new Date().getTime() + duration * 1000;
+        const price = duration * 0.25;
+        // const distance = endTime - startTime;
 
         const newOrder = {
             id,
@@ -233,14 +273,8 @@ export default class Map extends Component {
     _handleOnSetDuration = (ev) => {
         const duration = parseInt(ev.target.duration.value, 10);
         ev.preventDefault();
-
-        console.log('========== in the onSetDuration: ', duration);
-
-        // Setting the duration for the currently selected marker and starting the timer.
         const _marker = this.state.selectedMarker;
-        _marker.orderDuration = duration;
-        _marker.type = 'marker-red';
-        this.setState({ selectedMarker: _marker, popupInfo: _marker });
+        this._startTimer(duration, _marker);
     }
 
     //======================================================================================//
